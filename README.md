@@ -37,7 +37,8 @@ python3 -m http.server 8000
 | 파일 | 설명 |
 |---|---|
 | `index.html` | 화면 구조와 스타일 |
-| `app.js` | 상태 관리, 편집 UI, A4 미리보기. 기본 예시 데이터는 `DEFAULT_DATA` |
+| `app.js` | 상태 관리, 편집 UI, A4 미리보기 |
+| `default-data.json` | 처음 열 때·초기화할 때 불러오는 기본 예시 데이터 |
 | `sw.js` | 오프라인 캐시 (네트워크 우선, 실패 시 캐시) |
 | `manifest.webmanifest` | PWA 설정 |
 

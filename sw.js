@@ -1,10 +1,11 @@
 /* 오프라인 캐시 — 앱 셸만 담는다. 이력서 내용은 localStorage에 있다. */
 
-const CACHE = 'resume-builder-v1';
+const CACHE = 'resume-builder-v2';
 const SHELL = [
   './',
   './index.html',
   './app.js',
+  './default-data.json',
   './manifest.webmanifest',
   './icon.svg',
   './icon-192.png',

@@ -1,0 +1,161 @@
+{
+  "title": "이력서",
+  "name": "홍길동",
+  "sections": [
+    {
+      "label": "인적사항",
+      "entries": [
+        {
+          "period": "",
+          "rows": [
+            {
+              "label": "성명",
+              "text": "홍길동",
+              "style": "normal"
+            },
+            {
+              "label": "생년월일",
+              "text": "1990. 01. 01",
+              "style": "normal"
+            },
+            {
+              "label": "휴대전화",
+              "text": "010 - 0000 - 0000",
+              "style": "normal"
+            },
+            {
+              "label": "Email",
+              "text": "example@example.com",
+              "style": "normal"
+            },
+            {
+              "label": "GitHub",
+              "text": "github.com/example",
+              "style": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "학력사항",
+      "entries": [
+        {
+          "period": "2016. 03 - 2018. 02",
+          "rows": [
+            {
+              "label": "",
+              "text": "○○대학교 대학원",
+              "style": "normal"
+            },
+            {
+              "label": "",
+              "text": "컴퓨터공학과 석사 졸업 (4.00 / 4.5)",
+              "style": "normal"
+            }
+          ]
+        },
+        {
+          "period": "2012. 03 - 2016. 02",
+          "rows": [
+            {
+              "label": "",
+              "text": "○○대학교",
+              "style": "normal"
+            },
+            {
+              "label": "",
+              "text": "컴퓨터공학과 학사 졸업 (3.80 / 4.5)",
+              "style": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "직장경력",
+      "entries": [
+        {
+          "period": "2020. 03 - 현재",
+          "rows": [
+            {
+              "label": "회사",
+              "text": "주식회사 예시소프트",
+              "style": "normal"
+            },
+            {
+              "label": "직책",
+              "text": "백엔드 개발자",
+              "style": "normal"
+            },
+            {
+              "label": "",
+              "text": "주문 관리 서비스 개발",
+              "style": "bold"
+            },
+            {
+              "label": "",
+              "style": "block",
+              "text": "[주요 성과]\nREST API 설계 및 구현으로 주문 처리 시간 30% 단축\n캐시 도입으로 평균 응답 시간 800ms → 200ms 개선\n\n[기술 스택]\n백엔드: Python, FastAPI, PostgreSQL\n인프라: Docker, GitHub Actions"
+            }
+          ]
+        },
+        {
+          "period": "2018. 03 - 2020. 02",
+          "rows": [
+            {
+              "label": "회사",
+              "text": "주식회사 샘플테크",
+              "style": "normal"
+            },
+            {
+              "label": "직책",
+              "text": "주니어 개발자",
+              "style": "normal"
+            },
+            {
+              "label": "",
+              "text": "사내 관리 도구 개발 및 유지보수",
+              "style": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "교육사항",
+      "entries": [
+        {
+          "period": "2017. 07 - 2017. 12",
+          "rows": [
+            {
+              "label": "교육기관",
+              "text": "○○ IT 아카데미",
+              "style": "normal"
+            },
+            {
+              "label": "교 육 명",
+              "text": "웹 서비스 개발 과정",
+              "style": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "자격사항",
+      "entries": [
+        {
+          "period": "2019. 06",
+          "rows": [
+            {
+              "label": "",
+              "text": "정보처리기사",
+              "style": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

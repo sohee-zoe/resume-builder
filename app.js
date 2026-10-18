@@ -8,96 +8,20 @@ const PAPER_W = 210 * MM;      // A4 폭
 /* style: 'normal' | 'bold' | 'block'
    block 행은 바로 위 행에 붙어서 렌더링된다(사이에 줄이 그어지지 않음). */
 
-const DEFAULT_DATA = {
-  title: '이력서',
-  name: '홍길동',
-  sections: [
-    {
-      label: '인적사항',
-      entries: [{
-        period: '',
-        rows: [
-          { label: '성명', text: '홍길동', style: 'normal' },
-          { label: '생년월일', text: '1990. 01. 01', style: 'normal' },
-          { label: '휴대전화', text: '010 - 0000 - 0000', style: 'normal' },
-          { label: 'Email', text: 'example@example.com', style: 'normal' },
-          { label: 'GitHub', text: 'github.com/example', style: 'normal' }
-        ]
-      }]
-    },
-    {
-      label: '학력사항',
-      entries: [
-        {
-          period: '2016. 03 - 2018. 02',
-          rows: [
-            { label: '', text: '○○대학교 대학원', style: 'normal' },
-            { label: '', text: '컴퓨터공학과 석사 졸업 (4.00 / 4.5)', style: 'normal' }
-          ]
-        },
-        {
-          period: '2012. 03 - 2016. 02',
-          rows: [
-            { label: '', text: '○○대학교', style: 'normal' },
-            { label: '', text: '컴퓨터공학과 학사 졸업 (3.80 / 4.5)', style: 'normal' }
-          ]
-        }
-      ]
-    },
-    {
-      label: '직장경력',
-      entries: [
-        {
-          period: '2020. 03 - 현재',
-          rows: [
-            { label: '회사', text: '주식회사 예시소프트', style: 'normal' },
-            { label: '직책', text: '백엔드 개발자', style: 'normal' },
-            { label: '', text: '주문 관리 서비스 개발', style: 'bold' },
-            {
-              label: '', style: 'block',
-              text: '[주요 성과]\n' +
-                'REST API 설계 및 구현으로 주문 처리 시간 30% 단축\n' +
-                '캐시 도입으로 평균 응답 시간 800ms → 200ms 개선\n' +
-                '\n' +
-                '[기술 스택]\n' +
-                '백엔드: Python, FastAPI, PostgreSQL\n' +
-                '인프라: Docker, GitHub Actions'
-            }
-          ]
-        },
-        {
-          period: '2018. 03 - 2020. 02',
-          rows: [
-            { label: '회사', text: '주식회사 샘플테크', style: 'normal' },
-            { label: '직책', text: '주니어 개발자', style: 'normal' },
-            { label: '', text: '사내 관리 도구 개발 및 유지보수', style: 'normal' }
-          ]
-        }
-      ]
-    },
-    {
-      label: '교육사항',
-      entries: [{
-        period: '2017. 07 - 2017. 12',
-        rows: [
-          { label: '교육기관', text: '○○ IT 아카데미', style: 'normal' },
-          { label: '교 육 명', text: '웹 서비스 개발 과정', style: 'normal' }
-        ]
-      }]
-    },
-    {
-      label: '자격사항',
-      entries: [{
-        period: '2019. 06',
-        rows: [{ label: '', text: '정보처리기사', style: 'normal' }]
-      }]
-    }
-  ]
-};
+/* 기본 예시 데이터는 default-data.json 에 있다 (처음 열 때·초기화할 때 불러온다). */
+let defaultDataPromise = null;
+function getDefaultData() {
+  if (!defaultDataPromise) {
+    defaultDataPromise = fetch('default-data.json', { cache: 'no-cache' })
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .catch(() => ({ title: '이력서', name: '', sections: [] }));
+  }
+  return defaultDataPromise.then(d => structuredClone(d));
+}
 
 /* ───────────────────────── 상태 ───────────────────────── */
 
-let state = load() || structuredClone(DEFAULT_DATA);
+let state = load();   // 저장된 내용이 없으면 시작할 때 기본 데이터로 채운다
 const collapsed = new Set();
 /* 항목·행을 추가한 뒤 그 자리로 스크롤하기 위한 표식 (다시 그린 뒤 찾아간다) */
 let pendingFocus = null;
@@ -596,9 +520,9 @@ document.getElementById('fileInput').onchange = ev => {
   ev.target.value = '';
 };
 
-document.getElementById('btnReset').onclick = () => {
+document.getElementById('btnReset').onclick = async () => {
   if (!confirm('입력한 내용을 모두 지우고 기본 예시로 되돌릴까요?')) return;
-  state = structuredClone(DEFAULT_DATA);
+  state = await getDefaultData();
   collapsed.clear();
   refresh();
 };
@@ -616,9 +540,12 @@ window.addEventListener('resize', fitPaper);
 
 /* ───────────────────────── 시작 ───────────────────────── */
 
-renderEditor();
-renderPaper();
-setSaveState('준비됨');
+(async () => {
+  if (!state) state = await getDefaultData();
+  renderEditor();
+  renderPaper();
+  setSaveState('준비됨');
+})();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
