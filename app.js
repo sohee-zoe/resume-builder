@@ -66,7 +66,8 @@ function escapeHtml(s) {
 /* **굵게**, __밑줄__, [텍스트](주소), "- "로 시작하는 줄은 불릿 */
 function inlineMarkup(raw) {
   const lines = String(raw).split('\n');
-  return lines.map(line => {
+  const bullet = lines.map(l => /^\s*-\s+/.test(l));
+  const parts = lines.map(line => {
     const isBullet = /^\s*-\s+/.test(line);
     let t = escapeHtml(isBullet ? line.replace(/^\s*-\s+/, '') : line);
     t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
@@ -74,7 +75,10 @@ function inlineMarkup(raw) {
     t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     t = t.replace(/__([^_]+)__/g, '<u>$1</u>');
     return isBullet ? `<span class="bul">• ${t}</span>` : t;
-  }).join('\n');
+  });
+  /* 불릿은 block 요소라 앞뒤의 줄바꿈 문자가 빈 줄로 한 번 더 그려진다 — 붙어 있는 곳에서는 뺀다 */
+  return parts.reduce((out, part, i) =>
+    out + (i && !bullet[i] && !bullet[i - 1] ? '\n' : '') + part, '');
 }
 
 function move(arr, i, d) {
