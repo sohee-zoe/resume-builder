@@ -197,52 +197,65 @@ function renderPaper() {
   viewer.scrollTop = prevTop;
 }
 
-/* 한 페이지에 안 들어가는 덩어리는 "쪼개도 됨"으로 풀어 준다.
-   풀어 주지 않으면 브라우저가 통째로 다음 장으로 밀어 큰 공백이 생긴다. */
+/* 한 페이지보다 큰 덩어리만 "쪼개도 됨"으로 푼다.
+   그보다 작으면 경계에 걸려도 자르지 않고 통째로 다음 장으로 넘긴다. */
 const PAGE_CONTENT_H = (297 - 19 - 16) * MM;   // 인쇄 시 실제 본문 높이
 
 function markTallBlocks() {
-  document.querySelectorAll('#paper .sec-ent').forEach(n => {
-    n.classList.toggle('tall', n.offsetHeight > PAGE_CONTENT_H * 0.88);
-  });
-  document.querySelectorAll('#paper .prow').forEach(n => {
-    n.classList.toggle('tall', n.offsetHeight > PAGE_CONTENT_H * 0.6);
+  document.querySelectorAll('#paper .sec-ent, #paper .prow').forEach(n => {
+    n.classList.toggle('tall', n.offsetHeight > PAGE_CONTENT_H);
   });
 }
 
 /* 화면에서 페이지가 어디서 끊길지 점선으로 보여 준다(인쇄 시 숨김).
-   인쇄 CSS와 같은 규칙(항목은 통째로 넘김 · tall 항목은 분할 · forced는 강제 개행)으로
-   계산하지만, 연속 흐름 좌표를 쓰기 때문에 아래로 갈수록 오차가 쌓인다 — 어디까지나 예상선이다. */
+   인쇄 CSS와 같은 규칙(덩어리는 통째로 넘김 · 한 페이지보다 큰 항목만 행 단위로 분할 ·
+   forced는 강제 개행)으로 계산하지만, 연속 흐름 좌표를 쓰기 때문에 아래로 갈수록
+   오차가 쌓인다 — 어디까지나 예상선이다. */
 function drawPageGuides() {
   const paper = document.getElementById('paper');
   const old = paper.querySelector('.page-guides');
   if (old) old.remove();
 
   const topPad = 19 * MM;
-  const yOf = n => n.offsetTop - topPad;            // 본문 기준 좌표
-  const blocks = [...paper.querySelectorAll('.sec-head, .sec-ent')];
+  const yOf = n => {                                 // 본문 기준 좌표
+    let y = 0;
+    for (let e = n; e && e !== paper; e = e.offsetParent) y += e.offsetTop;
+    return y - topPad;
+  };
+
+  /* 자르지 않고 옮길 단위로 펼친다: 섹션 제목, 항목, (큰 항목은) 그 안의 행 */
+  const units = [];
+  paper.querySelectorAll('.sec-head, .sec-ent').forEach(b => {
+    if (b.classList.contains('sec-head')) { units.push({ n: b, head: true }); return; }
+    const forced = b.classList.contains('forced');
+    if (!b.classList.contains('tall')) { units.push({ n: b, start: b, forced }); return; }
+    b.querySelectorAll('.prow').forEach((r, i) =>
+      units.push({ n: r, start: i === 0 ? b : r, forced: forced && i === 0 }));
+  });
+
   const breaks = [];
   let pageTop = 0;
 
-  blocks.forEach((b, i) => {
-    const bTop = yOf(b);
-    const bH = b.offsetHeight;
-    const tall = b.classList.contains('tall');
+  units.forEach((u, i) => {
+    const top = yOf(u.n);
+    const h = u.n.offsetHeight;
 
-    if (b.classList.contains('forced')) {
-      if (bTop > pageTop) { breaks.push(bTop); pageTop = bTop; }
-    } else if (!tall && bTop + bH - pageTop > PAGE_CONTENT_H) {
-      /* 섹션 제목만 페이지 끝에 남지 않도록 제목부터 함께 넘긴다 */
-      const prev = blocks[i - 1];
-      let start = (prev && prev.classList.contains('sec-head')) ? yOf(prev) : bTop;
-      if (start > pageTop) { breaks.push(start); pageTop = start; }
+    if (u.forced) {
+      const t = yOf(u.start);
+      if (t > pageTop) { breaks.push(t); pageTop = t; }
     }
 
-    if (tall) {
-      while (bTop + bH - pageTop > PAGE_CONTENT_H) {
+    if (h > PAGE_CONTENT_H) {
+      /* 한 페이지보다 큰 덩어리만 어쩔 수 없이 쪼갠다 */
+      while (top + h - pageTop > PAGE_CONTENT_H) {
         pageTop += PAGE_CONTENT_H;
         breaks.push(pageTop);
       }
+    } else if (top + h - pageTop > PAGE_CONTENT_H) {
+      /* 섹션 제목만 페이지 끝에 남지 않도록 제목부터 함께 넘긴다 */
+      const prev = units[i - 1];
+      const start = (prev && prev.head) ? yOf(prev.n) : yOf(u.start || u.n);
+      if (start > pageTop) { breaks.push(start); pageTop = start; }
     }
   });
 
