@@ -140,6 +140,8 @@ const newSection = preset => ({
 
 function renderPaper() {
   const paper = document.getElementById('paper');
+  const viewer = document.getElementById('viewer');
+  const prevTop = viewer.scrollTop;   /* 비웠다 채우는 동안 밀리지 않게 */
   paper.innerHTML = '';
 
   paper.appendChild(el('div', 'doc-title', state.title || ''));
@@ -188,6 +190,7 @@ function renderPaper() {
   markTallBlocks();
   drawPageGuides();
   fitPaper();
+  viewer.scrollTop = prevTop;
 }
 
 /* 한 페이지에 안 들어가는 덩어리는 "쪼개도 됨"으로 풀어 준다.
@@ -271,12 +274,17 @@ function fitPaper() {
 /* ───────────────────────── 편집 UI 렌더링 ───────────────────────── */
 
 function autoGrow(ta) {
+  /* height를 auto로 줄였다 늘리는 사이 스크롤 높이가 줄어 위치가 밀리므로 되돌려 놓는다 */
+  const pane = document.getElementById('editor');
+  const top = pane.scrollTop;
   ta.style.height = 'auto';
   ta.style.height = (ta.scrollHeight + 2) + 'px';
+  pane.scrollTop = top;
 }
 
 function renderEditor() {
   const root = document.getElementById('editor');
+  const prevTop = root.scrollTop;   /* 다시 그려도 보던 자리를 유지한다 */
   root.innerHTML = '';
 
   /* 문서 제목 · 이름 */
@@ -412,6 +420,10 @@ function renderEditor() {
 
     root.appendChild(card);
   });
+
+  /* textarea 높이는 다음 프레임에 맞춰지므로, 지금과 그 뒤 두 번 위치를 되돌린다 */
+  root.scrollTop = prevTop;
+  requestAnimationFrame(() => { root.scrollTop = prevTop; });
 
   revealPending();
 }
