@@ -154,7 +154,7 @@ function renderPaper() {
   state.sections.forEach(sec => {
     const g = el('div', 'sec');
 
-    const head = el('div', 'sec-head');
+    const head = el('div', 'sec-head' + (sec.pageBreak ? ' forced' : ''));
     head.append(el('div', 'sec-h-l', sec.label || ''), el('div', 'sec-h-r'));
     g.appendChild(head);
 
@@ -226,7 +226,10 @@ function drawPageGuides() {
   /* 자르지 않고 옮길 단위로 펼친다: 섹션 제목, 항목, (큰 항목은) 그 안의 행 */
   const units = [];
   paper.querySelectorAll('.sec-head, .sec-ent').forEach(b => {
-    if (b.classList.contains('sec-head')) { units.push({ n: b, head: true }); return; }
+    if (b.classList.contains('sec-head')) {
+      units.push({ n: b, head: true, start: b, forced: b.classList.contains('forced') });
+      return;
+    }
     const forced = b.classList.contains('forced');
     if (!b.classList.contains('tall')) { units.push({ n: b, start: b, forced }); return; }
     b.querySelectorAll('.prow').forEach((r, i) =>
@@ -340,7 +343,12 @@ function renderEditor() {
     title.value = sec.label || '';
     title.addEventListener('input', () => { sec.label = title.value; renderPaper(); scheduleSave(); });
 
-    ch.append(disc, title,
+    const secBrk = opBtn('⤓', '이 섹션부터 새 페이지에서 시작', () => {
+      sec.pageBreak = !sec.pageBreak; refresh();
+    });
+    if (sec.pageBreak) secBrk.classList.add('on');
+
+    ch.append(disc, title, secBrk,
       opBtn('↑', '위로', () => { if (move(state.sections, si, -1)) { collapsed.clear(); refresh(); } }),
       opBtn('↓', '아래로', () => { if (move(state.sections, si, 1)) { collapsed.clear(); refresh(); } }),
       opBtn('✕', '섹션 삭제', () => {

@@ -241,6 +241,7 @@ button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit
 .sec-ent{break-inside:avoid;page-break-inside:avoid}
 .sec-ent.tall{break-inside:auto;page-break-inside:auto}
 .sec-ent.forced{break-before:page;page-break-before:always}
+.sec-head.forced{break-before:page;page-break-before:always}
 .sec-h-l,.sec-h-r{border-top:1.4pt solid var(--rule-strong);padding-top:1.6mm}
 .sec-h-l{font-size:9.5pt;font-weight:700;letter-spacing:.01em}
 .sec-h-r{min-height:1px}
@@ -249,8 +250,8 @@ button,input,textarea,select{font-family:inherit;font-size:inherit;color:inherit
 .sec-ent.gap .ent-l,.sec-ent.gap .ent-r{padding-top:4.5mm}
 .sec-ent.forced .ent-l,.sec-ent.forced .ent-r{padding-top:0}
 @media screen{
-  .sec-ent.forced{position:relative}
-  .sec-ent.forced::before{
+  .sec-ent.forced,.sec-head.forced{position:relative}
+  .sec-ent.forced::before,.sec-head.forced::before{
     content:"";position:absolute;left:0;right:0;top:-2mm;
     border-top:.8pt dashed #e0563f;
   }
